@@ -1,0 +1,64 @@
+#deployment parameters
+deploy_model: "efficientnet"
+
+#training parameters
+batch_size: 32
+learning_rate: 0.001
+epochs: 20
+input_size: 256
+num_classes: 5
+
+# advanced training parameters
+advanced_training:
+  k_folds: 5
+  early_stopping_patience: 5
+  mixup_alpha: 0.2
+  cutmix_alpha: 1.0
+  focal_loss_gamma: 2.0
+  focal_loss_alpha: 0.25
+  label_smoothing: 0.1
+
+#model checkpoints
+checkpoints:
+  baseline_cnn: experiments/baseline_cnn/checkpoints/baseline_cnn_best.pth
+  resnet_frozen: experiments/resnet_frozen/checkpoints/resnet_frozen_best.pth
+  resnet_finetuned: experiments/resnet_finetuned/checkpoints/resnet50_finetuned_best.pth
+  convnext: experiments/convnext/checkpoints/convnext_best.pth
+  efficientnet: experiments/efficientnet/checkpoints/efficientnet_best.pth
+  swin: experiments/swin/checkpoints/swin_best.pth
+
+#api parameters
+accepted_image_formats:
+  - image/jpeg
+  - image/png
+
+#dataset paths
+data_paths:
+  train: data/train
+  val: data/val
+  test: data/test
+
+#experiment output paths
+experiments:
+  baseline_cnn: experiments/baseline_cnn
+  resnet_frozen: experiments/resnet_frozen
+  resnet_finetuned: experiments/resnet_finetuned
+  convnext: experiments/convnext
+  efficientnet: experiments/efficientnet
+  swin: experiments/swin
+
+#model architecture parameters
+baseline_cnn:
+  dropout: 0.3
+  hidden_fc_size: 256
+
+resnet_transfer:
+  dropout: 0.5
+  hidden_fc_size: 512
+
+#optuna hyperparameter search bounds
+optuna:
+  n_trials: 20
+  lr_min: 0.00001
+  lr_max: 0.01
+  batch_sizes: [16, 32, 64]
