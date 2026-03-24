@@ -6,7 +6,7 @@ batch_size: 32
 learning_rate: 0.001
 epochs: 20
 input_size: 256
-num_classes: 5
+num_classes: 6
 
 # advanced training parameters
 advanced_training:
@@ -37,6 +37,8 @@ data_paths:
   train: data/train
   val: data/val
   test: data/test
+  seg_images: data_segmentation/images
+  seg_masks: data_segmentation/masks
 
 #experiment output paths
 experiments:
@@ -46,6 +48,7 @@ experiments:
   convnext: experiments/convnext
   efficientnet: experiments/efficientnet
   swin: experiments/swin
+  unet_segmentation: experiments/unet_segmentation
 
 #model architecture parameters
 baseline_cnn:

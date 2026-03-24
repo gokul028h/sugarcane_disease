@@ -1,7 +1,7 @@
 import timm
 import torch.nn as nn
 
-def create_advanced_model(model_name: str, num_classes: int = 5, pretrained: bool = True) -> nn.Module:
+def create_advanced_model(model_name: str, num_classes: int = 6, pretrained: bool = True) -> nn.Module:
     """
     Creates an advanced benchmark model using the `timm` library.
     
@@ -25,7 +25,7 @@ def create_advanced_model(model_name: str, num_classes: int = 5, pretrained: boo
     model = timm.create_model(timm_model_name, pretrained=pretrained, num_classes=num_classes)
     return model
 
-def load_legacy_model(model_name: str, num_classes: int = 5):
+def load_legacy_model(model_name: str, num_classes: int = 6):
     """
     Loads legacy models (baseline_cnn, resnet_transfer, resnet50_finetuned)
     for backward compatibility and comparison.
@@ -42,7 +42,7 @@ def load_legacy_model(model_name: str, num_classes: int = 5):
     else:
         raise ValueError(f"Legacy model {model_name} not found.")
 
-def get_model(model_name: str, num_classes: int = 5, pretrained: bool = True) -> nn.Module:
+def get_model(model_name: str, num_classes: int = 6, pretrained: bool = True) -> nn.Module:
     """
     Unified model factory to load both advanced and legacy models.
     """

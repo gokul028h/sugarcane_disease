@@ -12,7 +12,7 @@ with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 BATCH_SIZE = config.get("batch_size", 32)
-NUM_CLASSES = config.get("num_classes", 5)
+NUM_CLASSES = config.get("num_classes", 6)
 IMG_SIZE = config.get("input_size", 256)
 EXP_DIR = Path("experiments/baseline_cnn")
 EXP_DIR.mkdir(parents=True, exist_ok=True)

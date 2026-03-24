@@ -118,7 +118,7 @@ def get_advanced_dataloaders(batch_size: int = BATCH_SIZE, img_size: int = IMG_S
 
     return train_loader, val_loader, test_loader, details
 
-def get_mixup_cutmix(num_classes: int = 5, mixup_alpha: float = 0.2, cutmix_alpha: float = 1.0):
+def get_mixup_cutmix(num_classes: int = 6, mixup_alpha: float = 0.2, cutmix_alpha: float = 1.0):
     """
     Returns a v2 Transform that applies CutMix or MixUp randomly.
     Should be applied to the batch (images, targets) inside the training loop.

@@ -14,6 +14,10 @@ def get_target_layer(model, model_name: str):
     if "convnext" in model_name:
         return [model.stages[-1][-1]]
     elif "efficientnet" in model_name:
+        if hasattr(model, 'conv_head'): # timm version
+            return [model.conv_head]
+        elif hasattr(model, 'features'): # torchvision version
+            return [model.features[-1]]
         return [model.blocks[-1][-1]]
     elif "swin" in model_name:
         # For Swin Transformer, target the final norm layer or final block

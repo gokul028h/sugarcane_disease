@@ -11,7 +11,7 @@ with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 BATCH_SIZE = config.get("batch_size", 32)
-NUM_CLASSES = config.get("num_classes", 5)
+NUM_CLASSES = config.get("num_classes", 6)
 CHECKPOINT_PATH = "experiments/resnet_frozen/checkpoints/resnet_frozen_best.pth"
 EXP_DIR = Path("experiments/resnet_frozen")
 EXP_DIR.mkdir(parents=True, exist_ok=True)

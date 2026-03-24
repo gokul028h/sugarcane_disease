@@ -14,7 +14,7 @@ class BaselineCNN(nn.Module):
         Dropout applied after conv and FC layers
     """
 
-    def __init__(self, num_classes: int = 5, dropout: float = 0.3):
+    def __init__(self, num_classes: int = 6, dropout: float = 0.3):
         super().__init__()
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)

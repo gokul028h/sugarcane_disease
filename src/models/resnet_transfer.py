@@ -11,7 +11,7 @@ class ResNetTransfer(nn.Module):
         freeze_backbone (bool): If True, freeze all pretrained layers except the classifier.
     """
 
-    def __init__(self, num_classes: int = 5, freeze_backbone: bool = True):
+    def __init__(self, num_classes: int = 6, freeze_backbone: bool = True):
         super().__init__()
         self.backbone = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
 

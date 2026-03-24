@@ -11,7 +11,7 @@ with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 BATCH_SIZE = config.get("batch_size", 32)
-NUM_CLASSES = config.get("num_classes", 5)
+NUM_CLASSES = config.get("num_classes", 6)
 CHECKPOINT_PATH = config.get("checkpoint_path")
 EXP_DIR = Path("experiments/resnet_finetuned")
 EXP_DIR.mkdir(parents=True, exist_ok=True)

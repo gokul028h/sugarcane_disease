@@ -9,7 +9,7 @@ class ResNet50FineTuned(nn.Module):
     Only the last layer of layer4 and final FC layer are trainable.
     """
 
-    def __init__(self, num_classes: int = 5):
+    def __init__(self, num_classes: int = 6):
         super().__init__()
         self.model = models.resnet50(pretrained=True)
 
