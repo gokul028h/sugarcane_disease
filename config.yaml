@@ -2,11 +2,20 @@
 deploy_model: "efficientnet"
 
 #training parameters
-batch_size: 32
+batch_size: 16
 learning_rate: 0.001
-epochs: 20
+epochs: 1
 input_size: 256
 num_classes: 6
+
+# model-specific input sizes (some architectures require specific sizes)
+model_input_sizes:
+  baseline_cnn: 256
+  resnet_frozen: 256
+  resnet_finetuned: 256
+  convnext: 256
+  efficientnet: 256
+  swin: 224
 
 # advanced training parameters
 advanced_training:

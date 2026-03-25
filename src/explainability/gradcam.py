@@ -49,7 +49,7 @@ def generate_gradcam_heatmap(model, model_name: str, input_tensor: torch.Tensor,
     
     # Construct the CAM object once, and then re-use it on many images
     # We use reshape_transform for Vision Transformers (Swin/ViT) if supported, but pytorch_grad_cam handles many automatically now
-    cam = GradCAM(model=model, target_layers=target_layers, use_cuda=input_tensor.is_cuda)
+    cam = GradCAM(model=model, target_layers=target_layers)
     
     targets = [ClassifierOutputTarget(target_class)] if target_class is not None else None
     

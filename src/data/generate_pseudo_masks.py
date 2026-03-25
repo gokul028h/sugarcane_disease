@@ -51,7 +51,7 @@ def generate_masks():
     ])
 
     # Re-use GradCAM 
-    cam = GradCAM(model=model, target_layers=target_layers, use_cuda=torch.cuda.is_available())
+    cam = GradCAM(model=model, target_layers=target_layers)
 
     def process_image(img_path):
         img_pil = Image.open(img_path).convert("RGB")

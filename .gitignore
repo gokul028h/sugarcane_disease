@@ -7,6 +7,7 @@ __pycache__/
 venv/
 env/
 .venv/
+myenv/
 
 # PyTorch / ML
 *.ckpt
@@ -37,3 +38,6 @@ experiments/runs/
 # Dataset temp files
 data/*.zip
 data/*.tar
+data?* .png
+data?* .jpg
+data?* .jpeg

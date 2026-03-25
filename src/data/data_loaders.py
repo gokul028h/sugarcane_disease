@@ -124,7 +124,7 @@ def get_mixup_cutmix(num_classes: int = 6, mixup_alpha: float = 0.2, cutmix_alph
     Should be applied to the batch (images, targets) inside the training loop.
     """
     from torchvision.transforms import v2
-    cutmix = v2.CutMix(num_labels=num_classes, alpha=cutmix_alpha)
-    mixup = v2.MixUp(num_labels=num_classes, alpha=mixup_alpha)
+    cutmix = v2.CutMix(num_classes=num_classes, alpha=cutmix_alpha)
+    mixup = v2.MixUp(num_classes=num_classes, alpha=mixup_alpha)
     cutmix_or_mixup = v2.RandomChoice([cutmix, mixup])
     return cutmix_or_mixup
