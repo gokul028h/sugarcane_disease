@@ -31,25 +31,27 @@ def get_target_layer(model, model_name: str):
     # Fallback to the last common module if possible
     raise ValueError(f"Grad-CAM target layer logic not defined for {model_name}")
 
+def swin_reshape_transform(tensor, height=7, width=7):
+    """
+    Reshape Swin Transformer output sequence (B, N, C) back to 2D spatial (B, C, H, W).
+    Default for swin_tiny is 224/32 = 7x7 spatial grid at the end.
+    """
+    result = tensor.reshape(tensor.size(0), height, width, tensor.size(2))
+    result = result.transpose(2, 3).transpose(1, 2)
+    return result
+
 def generate_gradcam_heatmap(model, model_name: str, input_tensor: torch.Tensor, original_img: np.ndarray, target_class: int = None) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate Grad-CAM heatmap for a given input tensor and overlay it on the original image.
-
-    Args:
-        model: PyTorch model.
-        model_name (str): Identifier for the model architecture to find target layer.
-        input_tensor (torch.Tensor): Preprocessed input tensor (1, C, H, W).
-        original_img (np.ndarray): Original image as a float32 numpy array in [0, 1] range (H, W, 3).
-        target_class (int, optional): The class to explain. If None, explains highest scoring class.
-
-    Returns:
-        Tuple[np.ndarray, np.ndarray]: The raw heatmap (H, W) and the overlaid image (H, W, 3) in [0, 1] float32 format.
     """
     target_layers = get_target_layer(model, model_name)
     
-    # Construct the CAM object once, and then re-use it on many images
-    # We use reshape_transform for Vision Transformers (Swin/ViT) if supported, but pytorch_grad_cam handles many automatically now
-    cam = GradCAM(model=model, target_layers=target_layers)
+    # Swin/ViT specific transform
+    reshape_transform = None
+    if "swin" in model_name:
+        reshape_transform = swin_reshape_transform
+    
+    cam = GradCAM(model=model, target_layers=target_layers, reshape_transform=reshape_transform)
     
     targets = [ClassifierOutputTarget(target_class)] if target_class is not None else None
     
@@ -58,7 +60,6 @@ def generate_gradcam_heatmap(model, model_name: str, input_tensor: torch.Tensor,
     grayscale_cam = grayscale_cam[0, :]
     
     # Overlay on original image
-    # Note: original_img must be float [0, 1]
     visualization = show_cam_on_image(original_img, grayscale_cam, use_rgb=True)
     
     return grayscale_cam, visualization

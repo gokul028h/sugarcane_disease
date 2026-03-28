@@ -6,12 +6,16 @@ from pathlib import Path
 import json
 from tqdm import tqdm
 import time
+from torch.cuda.amp import GradScaler, autocast
 
 class RobustTrainer:
     """
-    A robust training loop with early stopping, TensorBoard logging,
-    mixed-precision support, and per-epoch history tracking for
-    IEEE publication-quality loss/accuracy curve generation.
+    A high-performance trainer optimized for IEEE-grade research.
+    Features:
+    - Automatic Mixed Precision (AMP) for faster training and lower VRAM usage.
+    - OneCycleLR / CosineAnnealingLR support.
+    - Comprehensive metric logging for publication-quality plots.
+    - Early stopping and modular checkpointing.
     """
     def __init__(self, model, device, criterion, optimizer, scheduler, patience: int, exp_dir: str, mixup_cutmix_fn=None):
         self.model = model.to(device)
@@ -23,6 +27,9 @@ class RobustTrainer:
         self.exp_dir = Path(exp_dir)
         self.mixup_cutmix_fn = mixup_cutmix_fn
         
+        # Mixed Precision Scaler
+        self.scaler = GradScaler()
+        
         self.exp_dir.mkdir(parents=True, exist_ok=True)
         (self.exp_dir / "checkpoints").mkdir(parents=True, exist_ok=True)
         self.writer = SummaryWriter(log_dir=str(self.exp_dir / "logs"))
@@ -31,7 +38,7 @@ class RobustTrainer:
         self.best_val_acc = 0.0
         self.epochs_without_improvement = 0
         
-        # Per-epoch history for plotting
+        # Per-epoch history for IEEE-ready plotting
         self.history = {
             "train_loss": [],
             "train_acc": [],
@@ -46,28 +53,37 @@ class RobustTrainer:
         correct = 0
         total = 0
 
-        pbar = tqdm(dataloader, desc=f"Epoch {epoch} Training")
+        pbar = tqdm(dataloader, desc=f"Epoch {epoch} Training [AMP ON]")
         for images, labels in pbar:
-            images, labels = images.to(self.device), labels.to(self.device)
+            images, labels = images.to(self.device, non_blocking=True), labels.to(self.device, non_blocking=True)
             
             if self.mixup_cutmix_fn is not None:
                 images, labels = self.mixup_cutmix_fn(images, labels)
 
-            self.optimizer.zero_grad()
-            outputs = self.model(images)
-            loss = self.criterion(outputs, labels)
+            self.optimizer.zero_grad(set_to_none=True) # Optimized zero_grad
             
-            loss.backward()
-            self.optimizer.step()
+            # Forward pass with Autocast
+            with autocast():
+                outputs = self.model(images)
+                loss = self.criterion(outputs, labels)
+            
+            # Scaled Backward Pass
+            self.scaler.scale(loss).backward()
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
+            
+            # Update Scheduler if it's per-step (like OneCycleLR)
+            if self.scheduler is not None and not isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                self.scheduler.step()
             
             running_loss += loss.item() * images.size(0)
             
-            # For CutMix/MixUp, labels are soft, accuracy calculation is tricky during train
+            # Accuracy calculation
             if self.mixup_cutmix_fn is None:
                 _, predicted = torch.max(outputs, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-                pbar.set_postfix({"loss": loss.item()})
+                pbar.set_postfix({"loss": f"{loss.item():.4f}", "lr": f"{self.optimizer.param_groups[0]['lr']:.6f}"})
 
         epoch_loss = running_loss / len(dataloader.dataset)
         epoch_acc = correct / total if total > 0 else 0.0
@@ -80,15 +96,16 @@ class RobustTrainer:
         total = 0
 
         with torch.no_grad():
-            for images, labels in dataloader:
-                images, labels = images.to(self.device), labels.to(self.device)
-                outputs = self.model(images)
-                loss = self.criterion(outputs, labels)
-                
-                running_loss += loss.item() * images.size(0)
-                _, predicted = torch.max(outputs, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
+            with autocast(): # Use autocast for validation too
+                for images, labels in dataloader:
+                    images, labels = images.to(self.device, non_blocking=True), labels.to(self.device, non_blocking=True)
+                    outputs = self.model(images)
+                    loss = self.criterion(outputs, labels)
+                    
+                    running_loss += loss.item() * images.size(0)
+                    _, predicted = torch.max(outputs, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
 
         epoch_loss = running_loss / len(dataloader.dataset)
         epoch_acc = correct / total
@@ -103,11 +120,9 @@ class RobustTrainer:
             
             current_lr = self.optimizer.param_groups[0]['lr']
             
-            if self.scheduler is not None:
-                if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-                    self.scheduler.step(val_loss)
-                else:
-                    self.scheduler.step()
+            # Update Scheduler if it's per-epoch (like ReduceLROnPlateau)
+            if self.scheduler is not None and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                self.scheduler.step(val_loss)
 
             # Record history
             self.history["train_loss"].append(train_loss)
@@ -124,15 +139,21 @@ class RobustTrainer:
             self.writer.add_scalar("Accuracy/Validation", val_acc, epoch)
             self.writer.add_scalar("Learning_Rate", current_lr, epoch)
             
-            print(f"Epoch {epoch}/{epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f}")
+            print(f"Epoch {epoch}/{epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f} | LR: {current_lr:.6f}")
 
             # Early stopping and model saving
             if val_loss < self.best_val_loss:
                 self.best_val_loss = val_loss
                 self.best_val_acc = val_acc
                 self.epochs_without_improvement = 0
-                torch.save(self.model.state_dict(), self.exp_dir / "checkpoints" / "best_model.pth")
-                print(">>> Saved new best model")
+                torch.save({
+                    'epoch': epoch,
+                    'model_state_dict': self.model.state_dict(),
+                    'optimizer_state_dict': self.optimizer.state_dict(),
+                    'scaler_state_dict': self.scaler.state_dict(),
+                    'val_acc': val_acc,
+                }, self.exp_dir / "checkpoints" / "best_model.pth")
+                print(">>> Saved new best model (including scaler state)")
             else:
                 self.epochs_without_improvement += 1
                 
@@ -143,12 +164,9 @@ class RobustTrainer:
         self.writer.close()
         
         total_time = time.time() - start_time
-        
-        # Count model parameters
         num_params = sum(p.numel() for p in self.model.parameters())
         trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
         
-        # Save metrics
         metrics = {
             "best_val_loss": self.best_val_loss,
             "best_val_accuracy": self.best_val_acc,
@@ -162,3 +180,4 @@ class RobustTrainer:
             json.dump(metrics, f, indent=4)
         
         return metrics
+

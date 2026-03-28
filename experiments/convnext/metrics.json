@@ -1,0 +1,25 @@
+{
+    "best_val_loss": 1.272834114666742,
+    "best_val_accuracy": 0.15720743345052737,
+    "stopped_epoch": 1,
+    "total_training_time_seconds": 12815.05,
+    "total_parameters": 27824742,
+    "trainable_parameters": 27824742,
+    "history": {
+        "train_loss": [
+            1.3661739886558686
+        ],
+        "train_acc": [
+            0.0
+        ],
+        "val_loss": [
+            1.272834114666742
+        ],
+        "val_acc": [
+            0.15720743345052737
+        ],
+        "lr": [
+            0.001
+        ]
+    }
+}

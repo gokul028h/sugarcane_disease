@@ -1,0 +1,118 @@
+{
+    "model_name": "swin",
+    "accuracy": 0.15180360721442887,
+    "per_class": {
+        "BacterialBlights": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 480
+        },
+        "Healthy": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 314
+        },
+        "Mosaic": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 278
+        },
+        "RedRot": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 312
+        },
+        "Rust": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 309
+        },
+        "Yellow": {
+            "precision": 0.15180360721442887,
+            "recall": 1.0,
+            "f1_score": 0.26359286646367985,
+            "support": 303
+        }
+    },
+    "macro_avg": {
+        "precision": 0.02530060120240481,
+        "recall": 0.16666666666666666,
+        "f1_score": 0.04393214441061331
+    },
+    "weighted_avg": {
+        "precision": 0.0230443351633126,
+        "recall": 0.15180360721442887,
+        "f1_score": 0.04001434796517785
+    },
+    "confusion_matrix": [
+        [
+            0,
+            0,
+            0,
+            0,
+            0,
+            480
+        ],
+        [
+            0,
+            0,
+            0,
+            0,
+            0,
+            314
+        ],
+        [
+            0,
+            0,
+            0,
+            0,
+            0,
+            278
+        ],
+        [
+            0,
+            0,
+            0,
+            0,
+            0,
+            312
+        ],
+        [
+            0,
+            0,
+            0,
+            0,
+            0,
+            309
+        ],
+        [
+            0,
+            0,
+            0,
+            0,
+            0,
+            303
+        ]
+    ],
+    "roc_auc_per_class": {
+        "BacterialBlights": 0.6873082948548812,
+        "Healthy": 0.37831630527806603,
+        "Mosaic": 0.41311735245098447,
+        "RedRot": 0.29939399476216577,
+        "Rust": 0.4163218443724427,
+        "Yellow": 0.5990586359285662
+    },
+    "average_precision_per_class": {
+        "BacterialBlights": 0.5079881733980709,
+        "Healthy": 0.12065586054577068,
+        "Mosaic": 0.12903262479068595,
+        "RedRot": 0.10440673371417725,
+        "Rust": 0.12328364340880256,
+        "Yellow": 0.20981829689738996
+    }
+}

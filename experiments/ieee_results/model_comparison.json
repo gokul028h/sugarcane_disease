@@ -1,0 +1,167 @@
+[
+    {
+        "model": "efficientnet",
+        "accuracy": 0.8997995991983968,
+        "precision": 0.9005631680289462,
+        "recall": 0.8918056143625849,
+        "f1": 0.8920542928836888,
+        "params_M": 17.559374,
+        "training_time_min": 25.5475,
+        "per_class": {
+            "BacterialBlights": {
+                "precision": 0.9657258064516129,
+                "recall": 0.9979166666666667,
+                "f1_score": 0.9815573770491803,
+                "support": 480
+            },
+            "Healthy": {
+                "precision": 0.894927536231884,
+                "recall": 0.7866242038216561,
+                "f1_score": 0.8372881355932205,
+                "support": 314
+            },
+            "Mosaic": {
+                "precision": 0.720108695652174,
+                "recall": 0.9532374100719424,
+                "f1_score": 0.8204334365325078,
+                "support": 278
+            },
+            "RedRot": {
+                "precision": 0.9855072463768116,
+                "recall": 0.8717948717948718,
+                "f1_score": 0.9251700680272109,
+                "support": 312
+            },
+            "Rust": {
+                "precision": 0.9423728813559322,
+                "recall": 0.8996763754045307,
+                "f1_score": 0.9205298013245033,
+                "support": 309
+            },
+            "Yellow": {
+                "precision": 0.8947368421052632,
+                "recall": 0.8415841584158416,
+                "f1_score": 0.8673469387755102,
+                "support": 303
+            }
+        },
+        "roc_auc": {
+            "BacterialBlights": 0.9998570800351803,
+            "Healthy": 0.9919624802138794,
+            "Mosaic": 0.9871504426261086,
+            "RedRot": 0.9918863054997259,
+            "Rust": 0.9946976977956312,
+            "Yellow": 0.9884595665709512
+        }
+    },
+    {
+        "model": "convnext",
+        "accuracy": 0.15731462925851702,
+        "precision": 0.026219104876419503,
+        "recall": 0.16666666666666666,
+        "f1": 0.04531024531024531,
+        "params_M": 27.824742,
+        "training_time_min": 213.58416666666665,
+        "per_class": {
+            "BacterialBlights": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 480
+            },
+            "Healthy": {
+                "precision": 0.15731462925851702,
+                "recall": 1.0,
+                "f1_score": 0.27186147186147186,
+                "support": 314
+            },
+            "Mosaic": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 278
+            },
+            "RedRot": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 312
+            },
+            "Rust": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 309
+            },
+            "Yellow": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 303
+            }
+        },
+        "roc_auc": {
+            "BacterialBlights": 0.7504878518029903,
+            "Healthy": 0.5729956375864341,
+            "Mosaic": 0.6275439485431447,
+            "RedRot": 0.6023357086302454,
+            "Rust": 0.5137526065496093,
+            "Yellow": 0.6387191288532279
+        }
+    },
+    {
+        "model": "swin",
+        "accuracy": 0.15180360721442887,
+        "precision": 0.02530060120240481,
+        "recall": 0.16666666666666666,
+        "f1": 0.04393214441061331,
+        "params_M": 27.523968,
+        "training_time_min": 52.94016666666666,
+        "per_class": {
+            "BacterialBlights": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 480
+            },
+            "Healthy": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 314
+            },
+            "Mosaic": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 278
+            },
+            "RedRot": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 312
+            },
+            "Rust": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1_score": 0.0,
+                "support": 309
+            },
+            "Yellow": {
+                "precision": 0.15180360721442887,
+                "recall": 1.0,
+                "f1_score": 0.26359286646367985,
+                "support": 303
+            }
+        },
+        "roc_auc": {
+            "BacterialBlights": 0.6873082948548812,
+            "Healthy": 0.37831630527806603,
+            "Mosaic": 0.41311735245098447,
+            "RedRot": 0.29939399476216577,
+            "Rust": 0.4163218443724427,
+            "Yellow": 0.5990586359285662
+        }
+    }
+]

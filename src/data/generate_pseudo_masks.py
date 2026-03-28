@@ -45,13 +45,15 @@ def generate_masks():
     target_layers = get_target_layer(model, MODEL_NAME)
 
     transform = transforms.Compose([
-        transforms.Resize((256, 256)),
+        transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
     # Re-use GradCAM 
-    cam = GradCAM(model=model, target_layers=target_layers)
+    from src.explainability.gradcam import swin_reshape_transform
+    reshape_transform = swin_reshape_transform if "swin" in MODEL_NAME.lower() else None
+    cam = GradCAM(model=model, target_layers=target_layers, reshape_transform=reshape_transform)
 
     def process_image(img_path):
         img_pil = Image.open(img_path).convert("RGB")
@@ -80,24 +82,41 @@ def generate_masks():
 
         return mask, cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
-    print("Beginning dataset parsing...")
+    from tqdm import tqdm
+    
+    # Pre-scan for progress tracking
+    image_files = []
     for root, dirs, files in os.walk(IMAGE_DIR):
         for file in files:
             if file.lower().endswith((".jpg", ".png", ".jpeg")):
-                img_path = os.path.join(root, file)
+                image_files.append(os.path.join(root, file))
+    
+    total_images = len(image_files)
+    print(f"Beginning dataset parsing for {total_images} images...")
+    
+    # Progress Bar with ETA and Memory Management
+    pbar = tqdm(image_files, desc="Generating Pseudo-Masks", unit="img")
+    
+    for img_path in pbar:
+        try:
+            mask, img_bgr = process_image(img_path)
+            
+            # Ensure matching filenames between images and masks
+            file_name = os.path.basename(img_path)
+            base_name = os.path.splitext(file_name)[0]
+            
+            mask_save_path = os.path.join(OUTPUT_MASK_DIR, f"{base_name}.png")
+            img_save_path = os.path.join(OUTPUT_IMG_DIR, f"{base_name}.jpg")
+            
+            cv2.imwrite(mask_save_path, mask)
+            cv2.imwrite(img_save_path, img_bgr)
+            
+            # Periodically Clear VRAM to prevent laptop crash
+            if pbar.n % 10 == 0:
+                torch.cuda.empty_cache()
                 
-                try:
-                    mask, img_bgr = process_image(img_path)
-                    
-                    # Ensure matching filenames between images and masks
-                    base_name = file.rsplit('.', 1)[0]
-                    mask_save_path = os.path.join(OUTPUT_MASK_DIR, f"{base_name}.png")
-                    img_save_path = os.path.join(OUTPUT_IMG_DIR, f"{base_name}.jpg")
-                    
-                    cv2.imwrite(mask_save_path, mask)
-                    cv2.imwrite(img_save_path, img_bgr)
-                except Exception as e:
-                    print(f"Error processing {img_path}: {e}")
+        except Exception as e:
+            pbar.write(f"Error processing {img_path}: {e}")
 
     print(f"Pseudo masks successfully generated in {OUTPUT_MASK_DIR}")
     print(f"Source images copied to {OUTPUT_IMG_DIR}")
